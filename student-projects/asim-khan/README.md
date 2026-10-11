@@ -160,6 +160,15 @@ reasons, not just "it's what was already installed":**
   (more processes/containers behind a load balancer) — nothing is given up by choosing
   Python over Node for this.
 
+**A note on the assignment brief's own stack choice:** the brief itself specifies a
+one-screen Streamlit app, not FastAPI + Jinja2. [`claim-intake-streamlit/`](claim-intake-streamlit/)
+implements that literal, scored shape standalone, alongside this larger build — see its own
+README for the data contract, setup, and the required modification. *(Full reasoning for why
+the primary build stays FastAPI rather than Streamlit — reuse of `check_claim`, the two-role
+auth/separation-of-duties design a bare Streamlit screen can't express, etc. — is still being
+drafted and will land here before submission; see `ROADMAP.md`'s Phase 0 in the working repo
+for the talking points so far.)*
+
 ### Set up the web UI
 
 ```bash
