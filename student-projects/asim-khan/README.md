@@ -160,14 +160,39 @@ reasons, not just "it's what was already installed":**
   (more processes/containers behind a load balancer) — nothing is given up by choosing
   Python over Node for this.
 
-**A note on the assignment brief's own stack choice:** the brief itself specifies a
-one-screen Streamlit app, not FastAPI + Jinja2. [`claim-intake-streamlit/`](claim-intake-streamlit/)
-implements that literal, scored shape standalone, alongside this larger build — see its own
-README for the data contract, setup, and the required modification. *(Full reasoning for why
-the primary build stays FastAPI rather than Streamlit — reuse of `check_claim`, the two-role
-auth/separation-of-duties design a bare Streamlit screen can't express, etc. — is still being
-drafted and will land here before submission; see `ROADMAP.md`'s Phase 0 in the working repo
-for the talking points so far.)*
+### A note on the assignment brief's own stack choice
+
+The brief itself specifies a one-screen Streamlit app, not FastAPI + Jinja2. I kept FastAPI as
+the primary build and added [`claim-intake-streamlit/`](claim-intake-streamlit/) as a
+standalone subfolder implementing the brief's literal, scored shape instead — not as a
+compromise, but because the two serve different purposes:
+
+- **Same-language reuse, lost if the whole project moved to Streamlit.** `app.py` (FastAPI)
+  imports `check_claim` directly from `main.py` — no network call, no serialization boundary.
+  `claim-intake-streamlit/logic.py` is a clean-room reimplementation of the same contract
+  specifically because the brief's own folder structure asks for a standalone app; that
+  duplication is a one-time cost for satisfying the assignment literally, not something I'd
+  want across the whole product.
+- **Two-role auth and separation of duties.** The real build has two distinct identities —
+  claimant (Google OAuth) and adjuster (provisioned username/password) — with different
+  permissions, different routes, and different screens per role. That's a core requirement of
+  the larger project (see "Claimant and adjuster pages are fully separate routes" above).
+  Streamlit's session model is built around one user per session; expressing clean role
+  separation, two distinct login flows, and persistent per-role views would mean working
+  against the framework rather than with it. FastAPI + Jinja2 gives direct control over
+  routing and session state per role.
+- **Persistent storage, document upload, and notifications.** The full build already has
+  SQLite-backed storage, real document uploads, and a notification feed — all explicitly out
+  of scope for the assignment's own minimum ("no database, no auth, no file uploads"). Those
+  are standard multi-page web-app concerns that a bare one-screen Streamlit app isn't built to
+  carry.
+- **Already deployed as a standard ASGI web app.** The FastAPI build runs on Azure App Service
+  behind Uvicorn, with HTTPS and OAuth redirect handling already solved. Streamlit has its own
+  deployment model (Streamlit Community Cloud, or `streamlit run` behind a reverse proxy) —
+  switching the primary build to it would mean re-solving deployment for no functional gain.
+
+`claim-intake-streamlit/` exists specifically so the brief's literal, scored shape is satisfied
+on its own terms, without compromising or rewriting the larger build around it.
 
 ### Set up the web UI
 
