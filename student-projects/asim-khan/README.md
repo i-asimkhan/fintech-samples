@@ -23,11 +23,15 @@ conflate them:**
 |---|---|---|
 | `claim-intake-streamlit/tests/test_logic.py` | **11** | The Assignment 7 submission's own suite — `check_claim`, run with `unittest`. |
 | `test_main.py` (this folder's root) | 5 | `main.py`, the original console checker the FastAPI app imports. An earlier, simpler version of the same check -- its document rule only requires a non-empty list, not a nonblank label. |
-| `tests/test_app.py` (this folder's root) | 41 | The FastAPI web app — routes, auth, storage, separation of duties, etc. |
+| `tests/test_app.py` (this folder's root) | 44 | The FastAPI web app — routes, auth, storage, separation of duties, etc. |
 | `tests/test_ui.py` (this folder's root) | 7 | Real-browser (Playwright) tests against the FastAPI web app. |
 
 Only the first row is part of the Assignment 7 submission; the other three test the larger,
 separate build described above.
+
+**System design exercise:** the high-level architecture (8 components, with diagrams) and the
+answer to the pressure test — what happens when an AI summary disagrees with the source
+evidence or omits a fact — are in [`docs/design/DESIGN.md`](docs/design/DESIGN.md).
 
 ## Quick start (run the full web app)
 
@@ -352,7 +356,7 @@ required, just convenient during development.
 .venv/Scripts/python.exe -m pytest tests/test_app.py -v
 ```
 
-41 tests. No real Google login is needed to run them — claimant login is faked
+44 tests. No real Google login is needed to run them — claimant login is faked
 with FastAPI's `dependency_overrides` on `get_current_user`, the standard way
 to test routes behind auth. Adjuster login is tested for real, not faked —
 `storage.create_adjuster` generates a real account and the tests actually
@@ -406,6 +410,12 @@ Only claimant-related UI tests need `SESSION_SECRET_KEY` in `.env` (the same
 signed-cookie technique the documentation screenshots use) — not real Google
 OAuth credentials, so this suite runs even without ever completing the
 Google Cloud Console setup.
+
+### System design
+
+[`docs/design/DESIGN.md`](docs/design/DESIGN.md) has the high-level architecture (8
+components, with diagrams) and the answer to the design exercise's pressure test: what
+happens when an AI summary disagrees with the source evidence or omits a fact.
 
 ### Screenshots
 
