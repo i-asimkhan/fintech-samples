@@ -3,6 +3,32 @@
 USF FIN 6934 (AI in Finance), System Design Studio — Assignment 7. HarborClaim is a
 fictional insurtech startup; this is my take-home build for its claim intake system.
 
+## What's actually being submitted for Assignment 7
+
+**[`claim-intake-streamlit/`](claim-intake-streamlit/) is the standalone Assignment 7
+submission** — it implements the build guide's own literal, scored spec: a one-screen
+Streamlit app, `check_claim(claim) -> {status, missing}`, no database, no auth, no file
+uploads, its own 11 tests (`tests/test_logic.py`), two screenshots, its own `README.md` and
+`AI_USAGE.md`. It's self-contained and doesn't depend on anything below this line.
+
+Everything else in this project folder — `main.py`/`test_main.py` at the root, and the full
+FastAPI web app around them — is a larger, separate build that grew out of the same
+assignment. It's not part of what's being scored here; see "Tech stack, and why" below for
+why it exists alongside the literal submission instead of replacing it.
+
+**Test counts, since there are four separate suites in this folder and it's easy to
+conflate them:**
+
+| Suite | Count | What it tests |
+|---|---|---|
+| `claim-intake-streamlit/tests/test_logic.py` | **11** | The Assignment 7 submission's own suite — `check_claim`, run with `unittest`. |
+| `test_main.py` (this folder's root) | 5 | The same completeness-checker contract, reused inside the larger FastAPI build. |
+| `tests/test_app.py` (this folder's root) | 41 | The FastAPI web app — routes, auth, storage, separation of duties, etc. |
+| `tests/test_ui.py` (this folder's root) | 7 | Real-browser (Playwright) tests against the FastAPI web app. |
+
+Only the first row is part of the Assignment 7 submission; the other three test the larger,
+separate build described above.
+
 ## Quick start (run the full web app)
 
 The graded minimum (`main.py`) needs nothing but Python — see "Run it" below. This is
@@ -326,7 +352,7 @@ required, just convenient during development.
 .venv/Scripts/python.exe -m pytest tests/test_app.py -v
 ```
 
-38 tests. No real Google login is needed to run them — claimant login is faked
+41 tests. No real Google login is needed to run them — claimant login is faked
 with FastAPI's `dependency_overrides` on `get_current_user`, the standard way
 to test routes behind auth. Adjuster login is tested for real, not faked —
 `storage.create_adjuster` generates a real account and the tests actually

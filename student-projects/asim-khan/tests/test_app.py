@@ -30,8 +30,8 @@ from auth import get_current_user
 
 client = TestClient(app_module.app)
 
-CLAIMANT = {"id": 1, "email": "claimant", "name": "Casey Claimant"}
-OTHER_CLAIMANT = {"id": 2, "email": "other", "name": "Other Person"}
+CLAIMANT = {"id": 1, "email": "claimant@example.com", "name": "Casey Claimant"}
+OTHER_CLAIMANT = {"id": 2, "email": "other@example.com", "name": "Other Person"}
 
 
 def setup_function(_):
@@ -90,9 +90,9 @@ def test_signed_out_new_claim_form_redirects_to_login_on_submit():
 
 def test_first_login_creates_an_account_behind_the_scenes():
     storage.reset()
-    assert storage.get_user("new-person") is None
-    storage.get_or_create_user("new-person", "New Person")
-    assert storage.get_user("new-person") is not None
+    assert storage.get_user("new-person@example.com") is None
+    storage.get_or_create_user("new-person@example.com", "New Person")
+    assert storage.get_user("new-person@example.com") is not None
 
 
 def test_signed_in_homepage_shows_the_submission_form():
@@ -191,6 +191,27 @@ def test_created_adjuster_password_is_random_and_only_returned_once():
     password_b = storage.create_adjuster("adjuster.b")
     assert password_a != password_b
     assert len(password_a) >= 12
+
+
+def test_reset_adjuster_password_changes_which_password_works():
+    old_password = storage.create_adjuster("rotate.test", "Rotate Test")
+    new_password = storage.reset_adjuster_password("rotate.test")
+
+    assert new_password is not None
+    assert new_password != old_password
+    assert storage.verify_adjuster("rotate.test", old_password) is None
+    assert storage.verify_adjuster("rotate.test", new_password) is not None
+
+
+def test_reset_adjuster_password_accepts_an_explicit_password():
+    storage.create_adjuster("rotate.explicit")
+    result = storage.reset_adjuster_password("rotate.explicit", password="chosen-value-123")
+    assert result == "chosen-value-123"
+    assert storage.verify_adjuster("rotate.explicit", "chosen-value-123") is not None
+
+
+def test_reset_adjuster_password_on_unknown_username_returns_none():
+    assert storage.reset_adjuster_password("does-not-exist") is None
 
 
 def test_wrong_adjuster_password_is_rejected():
@@ -314,7 +335,7 @@ def test_an_unlinked_adjuster_is_unaffected_by_the_conflict_check():
 
     # Linked to a *different* email than the claimant who filed this one --
     # the check should only ever fire on an exact match, never adjacent cases.
-    password = storage.create_adjuster("unrelated", linked_claimant_email="someone-else")
+    password = storage.create_adjuster("unrelated", linked_claimant_email="someone-else@example.com")
     login_as_adjuster("unrelated", password)
 
     allowed = client.post(
