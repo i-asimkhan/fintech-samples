@@ -22,7 +22,7 @@ conflate them:**
 | Suite | Count | What it tests |
 |---|---|---|
 | `claim-intake-streamlit/tests/test_logic.py` | **11** | The Assignment 7 submission's own suite — `check_claim`, run with `unittest`. |
-| `test_main.py` (this folder's root) | 5 | The same completeness-checker contract, reused inside the larger FastAPI build. |
+| `test_main.py` (this folder's root) | 5 | `main.py`, the original console checker the FastAPI app imports. An earlier, simpler version of the same check -- its document rule only requires a non-empty list, not a nonblank label. |
 | `tests/test_app.py` (this folder's root) | 41 | The FastAPI web app — routes, auth, storage, separation of duties, etc. |
 | `tests/test_ui.py` (this folder's root) | 7 | Real-browser (Playwright) tests against the FastAPI web app. |
 
