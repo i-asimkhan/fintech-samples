@@ -33,6 +33,20 @@ separate build described above.
 answer to the pressure test — what happens when an AI summary disagrees with the source
 evidence or omits a fact — are in [`docs/design/DESIGN.md`](docs/design/DESIGN.md).
 
+## Live demo (the larger build, not the graded submission)
+
+- **Claimant view:** <https://harborclaim-demo-2630.azurewebsites.net> — Google sign-in, in
+  OAuth Testing mode, so only accounts added as Test users can sign in.
+- **Adjuster view:** <https://harborclaim-demo-2630.azurewebsites.net/adjuster/login> —
+  username `demo.adjuster`.
+
+The adjuster password is never committed: the repo is public, and the build guide says not
+to include passwords. Both the username and password come from Azure App Service settings
+(`DEMO_ADJUSTER_USERNAME`, `DEMO_ADJUSTER_PASSWORD`). On every startup the app re-applies
+the current password, so rotating it is just changing that setting. The password is shared
+privately on request, and rotated after it has been sent anywhere it can't be taken back
+from, such as an email.
+
 ## Quick start (run the full web app)
 
 The graded minimum (`main.py`) needs nothing but Python — see "Run it" below. This is
